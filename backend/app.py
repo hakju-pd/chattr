@@ -11,7 +11,7 @@
 
 from flask import Flask
 from flask_cors import CORS
-from routes import api
+from routes import app
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Alle Routen aus routes.py hinzufügen.
-app.register_blueprint(api)
+app.register_blueprint(app)
 
 
 @app.get("/")

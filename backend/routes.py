@@ -21,7 +21,7 @@ from supabase_client import (
 
 # Ein "Blueprint" ist eine Sammlung von Routen.
 # In app.py wird dieser Blueprint dann eingebunden.
-api = Blueprint("api", __name__)
+app = Blueprint("api", __name__)
 
 
 # -----------------------------------------------------------------------------
@@ -30,8 +30,6 @@ api = Blueprint("api", __name__)
 #  Liest den Token aus dem Header  "Authorization: Bearer <token>"
 #  und gibt die user_id zurück (oder None, wenn niemand eingeloggt ist).
 #
-#  WICHTIG: Das ist KEIN Decorator (kein @-Schutz mit "wraps").
-#  Wir schützen Routen ganz einfach mit einem  if  -> siehe unten.
 # -----------------------------------------------------------------------------
 def aktueller_user(req):
     auth_header = req.headers.get("Authorization", "")
@@ -45,7 +43,7 @@ def aktueller_user(req):
 #  BENUTZERVERWALTUNG
 # =============================================================================
 
-@api.post("/register")
+@app.post("/register")
 def register():
     """Neuen Benutzer anlegen.  Body: { email, password, username }"""
     data = request.get_json() or {}
@@ -76,7 +74,7 @@ def register():
     return jsonify({"message": "Registrierung erfolgreich", "user_id": user.id}), 201
 
 
-@api.post("/login")
+@app.post("/login")
 def login():
     """Einloggen.  Body: { email, password }  ->  gibt access_token zurück."""
     data = request.get_json() or {}
@@ -98,17 +96,17 @@ def login():
 #  RÄUME (Tabelle: rooms)
 # =============================================================================
 
-@api.get("/rooms")
+@app.get("/rooms")
 def get_rooms():
     """Alle Räume laden (jeder darf das)."""
     result = supabase.table("rooms").select("*").order("created_at").execute()
     return jsonify(result.data)
 
 
-@api.post("/rooms")
+@app.post("/rooms")
 def create_room():
     """Neuen Raum anlegen.  Nur für eingeloggte Benutzer!"""
-    # ---- Schutz mit einfachem if (kein Decorator!) ----
+    # ---- Schutz mit einfachem if ----
     user_id = aktueller_user(request)
     if user_id is None:
         return jsonify({"error": "Bitte zuerst einloggen"}), 401
@@ -130,7 +128,7 @@ def create_room():
 #  NACHRICHTEN (Tabelle: messages)
 # =============================================================================
 
-@api.get("/rooms/<room_id>/messages")
+@app.get("/rooms/<room_id>/messages")
 def get_messages(room_id):
     """Alle Nachrichten eines Raums laden (mit Benutzername)."""
     result = (
@@ -144,10 +142,10 @@ def get_messages(room_id):
     return jsonify(result.data)
 
 
-@api.post("/rooms/<room_id>/messages")
+@app.post("/rooms/<room_id>/messages")
 def create_message(room_id):
     """Nachricht in einem Raum schreiben.  Nur für eingeloggte Benutzer!"""
-    # ---- Schutz mit einfachem if (kein Decorator!) ----
+    # ---- Schutz mit einfachem if ---
     user_id = aktueller_user(request)
     if user_id is None:
         return jsonify({"error": "Bitte zuerst einloggen"}), 401
@@ -170,7 +168,7 @@ def create_message(room_id):
 #  PROFILE (Tabelle: profiles)
 # =============================================================================
 
-@api.get("/profiles/<user_id>")
+@app.get("/profiles/<user_id>")
 def get_profile(user_id):
     """Ein einzelnes Profil laden."""
     result = supabase.table("profiles").select("*").eq("id", user_id).execute()
