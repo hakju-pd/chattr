@@ -230,3 +230,4 @@ Flask-Backend und Supabase verbunden.
 | Keine Räume sichtbar | Wurde `schema.sql` in Supabase ausgeführt? (Schritt 1) Und das TODO in `app/rooms.tsx` erledigt? |
 | „Bitte zuerst einloggen" beim Senden | Erst einloggen – `handleLogin` muss `setToken(data.access_token)` aufrufen. |
 | Computer + Handy finden sich nicht | Beide müssen im **gleichen WLAN** sein. |
+«

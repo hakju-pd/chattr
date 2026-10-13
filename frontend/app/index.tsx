@@ -20,30 +20,39 @@ export default function LoginScreen() {
   const [username, setUsername] = useState("");
 
   async function handleRegister() {
-    try {
-      // ===== TODO (Schritt 3): Registrieren – mit dem Backend verbinden =====
-      //  Sende eine POST-Anfrage an  `${API_URL}/register`
-      //  mit dem Body (JSON):  { email, password, username }
-      //  Bei Erfolg: Alert "Registrierung erfolgreich" anzeigen.
-      Alert.alert("TODO", "register ist noch nicht verbunden.\nSiehe docs/4_frontend_verbinden.md");
-      // =====================================================================
-    } catch (e: any) {
-      Alert.alert("Fehler", e.message);
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, username }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Registrierung fehlgeschlagen");
     }
+    Alert.alert("Super!", "Registrierung erfolgreich. Du kannst dich jetzt einloggen.");
+  } catch (e: any) {
+    Alert.alert("Fehler", e.message);
   }
+}
 
-  async function handleLogin() {
-    try {
-      // ===== TODO (Schritt 4): Login – mit dem Backend verbinden =====
-      //  1. POST an  `${API_URL}/login`  mit Body (JSON):  { email, password }
-      //  2. access_token holen und mit  setToken(...)  speichern
-      //  3. router.replace("/rooms")  -> weiter zur Raum-Liste
-      Alert.alert("TODO", "login ist noch nicht verbunden.\nSiehe docs/4_frontend_verbinden.md");
-      // ==============================================================
-    } catch (e: any) {
-      Alert.alert("Fehler", e.message);
+async function handleLogin() {
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Login fehlgeschlagen");
     }
+    setToken(data.access_token); // Token merken
+    router.replace("/rooms");    // weiter zur Raum-Liste
+  } catch (e: any) {
+    Alert.alert("Fehler", e.message);
   }
+}
 
   return (
     <View style={styles.container}>
